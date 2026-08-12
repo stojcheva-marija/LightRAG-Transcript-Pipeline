@@ -1,0 +1,7 @@
+flowchart LR
+    A[Voice cluster] --> B{In speaker directory?}
+    B -->|yes| C[Use that name]
+    B -->|no| D{LLM identifies speaker?}
+    D -->|yes| E[Name + remember voice]
+    D -->|no| F[Keep cluster id]
+    C --> G[Remember the voice]

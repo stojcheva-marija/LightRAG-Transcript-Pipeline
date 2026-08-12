@@ -1,0 +1,17 @@
+flowchart TD
+    A[Audio upload] --> B[Split into segments]
+    B --> C[NeMo diarization]
+    C --> D[TitaNet + HDBSCAN]
+    D --> E{Match speaker directory}
+    E -->|cosine match| F[Known speaker]
+    E -->|no match| G[LLM names from transcript]
+    C --> H[Whisper transcription]
+    H --> I[Merge speaker turns]
+    F --> J[Speaker-attributed text]
+    G --> J
+    I --> J
+    J --> K[LLM summary]
+    J --> L[Chunk + index]
+    K --> M[(Postgres: metadata + graph)]
+    L --> M
+    J --> N[(MinIO: audio + transcript)]

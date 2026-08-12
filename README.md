@@ -46,28 +46,14 @@ and speaker embeddings encode vocal rather than lexical characteristics.
 
 ## Ingestion
 
-```mermaid
-flowchart TD
-    A[Audio upload] --> B[Split into segments]
-    B --> C[NeMo diarization]
-    C --> D[TitaNet + HDBSCAN]
-    D --> E{Match speaker directory}
-    E -->|cosine match| F[Known speaker]
-    E -->|no match| G[LLM names from transcript]
-    C --> H[Whisper transcription]
-    H --> I[Merge speaker turns]
-    F --> J[Speaker-attributed text]
-    G --> J
-    I --> J
-    J --> K[LLM summary]
-    J --> L[Chunk + index]
-    K --> M[(Postgres: metadata + graph)]
-    L --> M
-    J --> N[(MinIO: audio + transcript)]
-```
+![Ingestion pipeline: audio upload through diarization, transcription, speaker resolution, and indexing into Postgres and MinIO](docs/diagrams/ingestion.svg)
 
 *Figure 1: The ingestion pipeline, from audio upload to indexed knowledge
 graph.*
+
+<sup>Source: [`docs/diagrams/ingestion.mmd`](docs/diagrams/ingestion.mmd), rendered as a
+static image because GitHub's live Mermaid renderer clips node text.
+Regenerate with `mmdc -i docs/diagrams/ingestion.mmd -o docs/diagrams/ingestion.svg -b white`.</sup>
 
 Diarization is the computationally dominant stage; its output is therefore
 cached in MinIO, and the `resume` operation re-executes all subsequent stages
@@ -81,17 +67,12 @@ Postgres/pgvector directory of known speakers; only those clusters that this
 comparison fails to resolve are passed to an LLM, and only the names the LLM
 supplies are written back to the directory.
 
-```mermaid
-flowchart LR
-    A[Voice cluster] --> B{In speaker directory?}
-    B -->|yes| C[Use that name]
-    B -->|no| D{LLM identifies speaker?}
-    D -->|yes| E[Name + remember voice]
-    D -->|no| F[Keep cluster id]
-    C --> G[Remember the voice]
-```
+![Speaker resolution: a directory match wins outright; only unmatched clusters go to the LLM](docs/diagrams/speaker-resolution.svg)
 
 *Figure 2: Precedence in speaker resolution.*
+
+<sup>Source: [`docs/diagrams/speaker-resolution.mmd`](docs/diagrams/speaker-resolution.mmd).
+Regenerate with `mmdc -i docs/diagrams/speaker-resolution.mmd -o docs/diagrams/speaker-resolution.svg -b white`.</sup>
 
 Empirical evidence takes precedence over inference: a directory match always
 supersedes an LLM proposal. Optional hints (`known_speakers`) are supplied to
