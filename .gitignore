@@ -11,6 +11,7 @@ venv/
 *.egg-info/
 dist/
 build/
+.pytest_cache/
 
 # Logs
 logs/
@@ -19,10 +20,10 @@ logs/
 # LightRAG working dirs
 rag_openai/
 rag_ollama/
+rag_postgres/
 
-# Data — keep datasets, ignore transcripts and evaluation results
-data/transcripts/
-data/evaluation/
+# Data — datasets, source recordings and evaluation results stay local
+data/
 
 # Frontend (Node)
 frontend/node_modules/

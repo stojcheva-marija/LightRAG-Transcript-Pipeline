@@ -1,3 +1,5 @@
+"""Typed config, loaded from env vars in one place via ``Config.from_env()``."""
+
 from __future__ import annotations
 
 import os
@@ -90,6 +92,27 @@ class DiarizationConfig:
 
 
 @dataclass(frozen=True)
+class LanguageConfig:
+    """The language of the recordings.
+
+    ``code`` is the ISO code Whisper is asked to transcribe in; ``name`` is the
+    English name of the language, which the knowledge base uses when prompting.
+    Changing these also means adapting the prompts under ``domain/prompts/`` and
+    ``infrastructure/rag/prompts/``, which are written in the target language.
+    """
+
+    code: str
+    name: str
+
+    @classmethod
+    def from_env(cls) -> LanguageConfig:
+        return cls(
+            code=os.getenv("LANGUAGE_CODE") or "mk",
+            name=os.getenv("LANGUAGE_NAME") or "Macedonian",
+        )
+
+
+@dataclass(frozen=True)
 class TranscriptionConfig:
     whisper_model: str
 
@@ -102,12 +125,15 @@ class TranscriptionConfig:
 
 @dataclass(frozen=True)
 class ChunkerConfig:
+    chunker_type: str
     block_window_size: int
     contextual_window_size: int
 
     @classmethod
     def from_env(cls) -> ChunkerConfig:
         return cls(
+            # Optional with a default so existing .env files keep working.
+            chunker_type=os.getenv("CHUNKER_TYPE") or "block",
             block_window_size=int(require_env("BLOCK_WINDOW_SIZE")),
             contextual_window_size=int(require_env("CONTEXTUAL_WINDOW_SIZE")),
         )
@@ -149,10 +175,10 @@ class Config:
     working_dir: str
     workspace: str
     vector_namespace: str
-    transcript_directory: str
     database: DatabaseConfig
     minio: MinIOConfig
     model: ModelConfig
+    language: LanguageConfig
     diarization: DiarizationConfig
     transcription: TranscriptionConfig
     chunker: ChunkerConfig
@@ -167,10 +193,10 @@ class Config:
             working_dir=require_env("WORKING_DIR"),
             workspace=require_env("WORKSPACE"),
             vector_namespace=require_env("VECTOR_NAMESPACE"),
-            transcript_directory=require_env("TRANSCRIPT_DIR"),
             database=DatabaseConfig.from_env(),
             minio=MinIOConfig.from_env(),
             model=ModelConfig.from_env(),
+            language=LanguageConfig.from_env(),
             diarization=DiarizationConfig.from_env(),
             transcription=TranscriptionConfig.from_env(),
             chunker=ChunkerConfig.from_env(),

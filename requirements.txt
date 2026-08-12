@@ -1,13 +1,17 @@
 # NeMo diarization (install first - pins torch, numpy, protobuf)
-nemo_toolkit[asr]>=2.4.0
+# <3.0 pinned: NeMo 3.0 dropped nemo.collections.asr.models.msdd_models (NeuralDiarizer)
+nemo_toolkit[asr]>=2.4.0,<3.0.0
 
 # RAG
+FlagEmbedding>=1.2.0
 lightrag-hku>=1.3.9
 openai>=1.98.0
 psycopg2-binary>=2.9.10
 python-dotenv>=1.1.1
 boto3>=1.34.0
-gradio==6.4.0
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
 langchain-openai>=0.1.0
 
 # Audio processing
@@ -23,7 +27,9 @@ hdbscan>=0.8.33
 scikit-learn>=1.4.0
 
 # Whisper transcription
-transformers>=4.40.0
+# <5.0 pinned: transformers 5.x removed PreTrainedTokenizer.prepare_for_model,
+# which FlagEmbedding's reranker relies on
+transformers>=4.40.0,<5.0.0
 torch>=2.1.0
 
 # pgvector
@@ -36,3 +42,6 @@ pandas>=2.0.0
 # Testing
 pytest>=8.0.0
 pytest-asyncio>=0.23.0
+
+# Dev tool: visualize_graph.py
+pyvis>=0.3.2

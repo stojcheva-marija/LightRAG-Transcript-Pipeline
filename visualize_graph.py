@@ -1,3 +1,12 @@
+"""Dev tool, not part of the app: renders the AGE knowledge graph as an
+interactive HTML file (pyvis), for eyeballing what a run actually indexed.
+
+    python visualize_graph.py
+
+Reads directly from Postgres via ``cypher()`` — bypasses every application
+layer on purpose, since its only job is to look at what's really in the graph.
+"""
+
 from __future__ import annotations
 
 import json
