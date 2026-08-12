@@ -1,7 +1,7 @@
 flowchart LR
-    A[Voice cluster] --> B{In speaker directory?}
-    B -->|yes| C[Use that name]
-    B -->|no| D{LLM identifies speaker?}
-    D -->|yes| E[Name + remember voice]
-    D -->|no| F[Keep cluster id]
-    C --> G[Remember the voice]
+    A[Voice cluster] --> B{Directory match found?}
+    B -->|yes| C[Assign directory name]
+    B -->|no| D{LLM infers identity?}
+    D -->|yes| E[Assign name; register voice]
+    D -->|no| F[Retain cluster identifier]
+    C --> G[Register voice embedding]

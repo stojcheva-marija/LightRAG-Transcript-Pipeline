@@ -67,7 +67,7 @@ Postgres/pgvector directory of known speakers; only those clusters that this
 comparison fails to resolve are passed to an LLM, and only the names the LLM
 supplies are written back to the directory.
 
-![Speaker resolution: a directory match wins outright; only unmatched clusters go to the LLM](docs/diagrams/speaker-resolution.svg)
+![Speaker resolution: a directory match takes precedence; only unresolved clusters are passed to the LLM](docs/diagrams/speaker-resolution.svg)
 
 *Figure 2: Precedence in speaker resolution.*
 
