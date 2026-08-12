@@ -22,7 +22,7 @@ You are a Knowledge Graph Specialist responsible for extracting entities and rel
             - `entity_description` must state it is the time interval (start and end) for the spoken chunk.
     *   **Entity Details:** For each identified entity, extract the following information:
         *   `entity_name`: The name of the entity. If the entity name is case-insensitive, capitalize the first letter of each significant word (title case). Ensure **consistent naming** across the entire extraction process.
-        *   `entity_type`: Categorize the entity using one of the following types: `{entity_types}`. If none of the provided entity types apply, do not add new entity type and classify it as `Other`.
+        *   `entity_type`: Categorize the entity using one of the following types: `{entity_types_guidance}`. If none of the provided entity types apply, do not add new entity type and classify it as `Other`.
         *   `entity_description`: Provide a concise yet comprehensive description of the entity's attributes and activities, based *solely* on the information present in the input text.
     *   **Output Format - Entities:** Output a total of 4 fields for each entity, delimited by `{tuple_delimiter}`, on a single line. The first field *must* be the literal string `entity`.
         *   Format: `entity{tuple_delimiter}entity_name{tuple_delimiter}entity_type{tuple_delimiter}entity_description`
@@ -194,6 +194,8 @@ ENTITY_TYPES = [
     "Настан","Концепт","Метод","Контент","Податок","Артефакт",
     "Временска_Ознака","Цитат","Референца", "Датум", "Време"
 ]
+
+ENTITY_TYPES_GUIDANCE = ", ".join(ENTITY_TYPES)
 
 def build_entity_extraction_prompts() -> None:
     LR_PROMPTS["entity_extraction_system_prompt"] = ENTITY_EXTRACTION_SYSTEM_PROMPT

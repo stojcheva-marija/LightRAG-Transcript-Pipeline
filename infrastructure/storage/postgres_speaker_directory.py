@@ -64,7 +64,7 @@ class PostgresSpeakerDirectory:
                 cur.execute("SELECT id, embedding FROM speakers WHERE name = %s", (name,))
                 row = cur.fetchone()
                 if row:
-                    avg_emb = self._normalize((np.array(row[1]) + norm_emb) / 2)
+                    avg_emb = self._normalize((row[1].to_numpy() + norm_emb) / 2)
                     cur.execute(
                         """UPDATE speakers
                            SET embedding  = %s,

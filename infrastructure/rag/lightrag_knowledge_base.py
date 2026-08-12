@@ -13,7 +13,7 @@ from domain.metadata import metadata_header
 from domain.retrieval import QueryKeywords, RetrievedAnswer
 from infrastructure.rag.context_parser import parse_context_chunks, parse_source_references
 from infrastructure.rag.prompts.entity_extraction import (
-    ENTITY_TYPES,
+    ENTITY_TYPES_GUIDANCE,
     build_entity_extraction_prompts,
 )
 from infrastructure.rag.prompts.rag_response import build_rag_response_prompts
@@ -82,7 +82,7 @@ class LightRAGKnowledgeBase:
             addon_params={
                 "postgres_config": postgres_config,
                 "language": self.config.language.name,
-                "entity_types": ENTITY_TYPES,
+                "entity_types_guidance": ENTITY_TYPES_GUIDANCE,
             },
         )
 
@@ -101,13 +101,17 @@ class LightRAGKnowledgeBase:
                 return False
 
             header = metadata_header(metadata)
-            for chunk in chunks:
-                await self._lightrag.ainsert(
-                    input=header + chunk.formatted_text,
-                    ids=chunk.chunk_id,
-                    file_paths=file_path,
-                    track_id=doc_id,
-                )
+            await self._lightrag.ainsert(
+                input=[header + chunk.formatted_text for chunk in chunks],
+                ids=[chunk.chunk_id for chunk in chunks],
+                # LightRAG treats any two documents with the same file_path as
+                # duplicates of each other, even within one batch — so each
+                # block needs its own distinct path. The suffix comes after
+                # ".txt" so citation parsing (which matches on the
+                # "transcripts/{stem}/{stem}.txt" substring) still finds it.
+                file_paths=[f"{file_path}#{chunk.chunk_id}" for chunk in chunks],
+                track_id=doc_id,
+            )
             return True
         except Exception:
             logger.exception("Failed to insert transcript doc_id=%s", doc_id)

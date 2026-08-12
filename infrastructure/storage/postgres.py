@@ -3,6 +3,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 
 import psycopg2
+from pgvector.psycopg2 import register_vector
 
 from config.settings import DatabaseConfig
 
@@ -14,7 +15,9 @@ class PostgresDatabase:
         self.db_config = db_config
 
     def connect(self):
-        return psycopg2.connect(**self.db_config.to_dict())
+        conn = psycopg2.connect(**self.db_config.to_dict())
+        register_vector(conn)
+        return conn
 
     @contextmanager
     def cursor(self, commit: bool = False, **kwargs):
