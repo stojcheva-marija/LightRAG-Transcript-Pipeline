@@ -49,21 +49,21 @@ and speaker embeddings encode vocal rather than lexical characteristics.
 ```mermaid
 flowchart TD
     A[Audio upload] --> B[Split into segments]
-    B --> C[NeMo diarization<br/>who spoke when]
-    C --> D[TitaNet embeddings<br/>+ HDBSCAN clustering]
-    D --> E{Match each voice against<br/>the speaker directory}
+    B --> C[NeMo diarization]
+    C --> D[TitaNet + HDBSCAN]
+    D --> E{Match speaker directory}
     E -->|cosine match| F[Known speaker]
-    E -->|no match| G[LLM reads the transcript<br/>and proposes a name]
-    C --> H[Whisper transcription<br/>per speaker segment]
-    H --> I[Merge consecutive turns<br/>by the same speaker]
-    F --> J[Speaker-attributed transcript]
+    E -->|no match| G[LLM names from transcript]
+    C --> H[Whisper transcription]
+    H --> I[Merge speaker turns]
+    F --> J[Speaker-attributed text]
     G --> J
     I --> J
-    J --> K[LLM summary:<br/>topics, summary, duration]
-    J --> L[Chunk + index into<br/>the knowledge graph]
-    K --> M[(Postgres:<br/>metadata + graph + vectors)]
+    J --> K[LLM summary]
+    J --> L[Chunk + index]
+    K --> M[(Postgres: metadata + graph)]
     L --> M
-    J --> N[(MinIO:<br/>audio + transcript)]
+    J --> N[(MinIO: audio + transcript)]
 ```
 
 *Figure 1: The ingestion pipeline, from audio upload to indexed knowledge
@@ -83,11 +83,11 @@ supplies are written back to the directory.
 
 ```mermaid
 flowchart LR
-    A[Voice cluster] --> B{In the speaker<br/>directory?}
+    A[Voice cluster] --> B{In speaker directory?}
     B -->|yes| C[Use that name]
-    B -->|no| D{LLM identifies it<br/>from the conversation?}
-    D -->|yes| E[Use that name<br/>+ remember the voice]
-    D -->|no| F[Keep the cluster id]
+    B -->|no| D{LLM identifies speaker?}
+    D -->|yes| E[Name + remember voice]
+    D -->|no| F[Keep cluster id]
     C --> G[Remember the voice]
 ```
 
